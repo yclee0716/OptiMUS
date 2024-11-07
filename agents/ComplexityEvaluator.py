@@ -23,28 +23,27 @@ Please provide a numeric rating between 1 and 10 for the complexity of this prob
 """
 
     def generate_reply(self, task: str, state: Dict, sender: Agent) -> (str, Dict):
-        # 获取用户提供的问题描述
+        # Get a description of the problem provided by the user
         problem_description = state.get("problem_description", "No description available.")
         
-        # 构建评估复杂度的提示词
+        # Constructing Cue Words for Evaluating Complexity
         prompt = self.prompt_template.format(problem_description=problem_description)
         messages = [{"role": "system", "content": prompt}]
         
-        # 调用 LLM 来评估问题的复杂度
+        # Call LLM to evaluate the complexity of the problem
         response = self.llm_call(messages=messages)
         
-        # 从响应中解析出复杂度评分和理由
+        # Parsing complexity scores and rationale from responses
         complexity_score = None
         explanation = None
         try:
-            # 假设响应是形如 "Complexity Rating: 7. Explanation: This problem is challenging because..." 的文本
             if "Complexity Rating:" in response:
                 complexity_score = int(response.split("Complexity Rating:")[1].split(".")[0].strip())
                 explanation = response.split("Explanation:")[1].strip()
         except Exception as e:
             print(f"Error parsing complexity evaluation response: {e}")
         
-        # 将复杂度评分和理由更新到状态中
+        # Update complexity score and rationale to status
         if complexity_score is not None:
             state["complexity_score"] = complexity_score
             state["complexity_explanation"] = explanation
