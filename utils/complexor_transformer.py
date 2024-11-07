@@ -4,7 +4,9 @@ import os
 import sys
 
 from misc import get_openai_client
+from agents.complexity_evaluator import ComplexityEvaluator
 
+complexity_evaluator = ComplexityEvaluator(client=client)
 
 prompt_template = """
 You are an expert mathematical modeler and an optimization professor at a top university.
@@ -177,6 +179,14 @@ def transform_complexor_instance(folder_path: str, client):
 
     update = json.loads(output_json)
 
+    # After generating the updated problem description and parameters
+    # We use ComplexityEvaluator to assess the complexity of the optimization problem
+    # Integrate ComplexityEvaluator for complexity assessment
+    
+    complexity_report = complexity_evaluator.evaluate_complexity(update)
+    update["complexity_score"] = complexity_report["score"]
+    update["complexity_details"] = complexity_report["details"]
+    
     output_desc = update["description"]
     for param in update["parameters"]:
         if "_" in param["symbol"]:
