@@ -7,7 +7,7 @@ from typing import List, Dict, Union
 import openai
 import numpy as np
 from mistralai.client import MistralClient
-
+from agents.complexity_evaluator import ComplexityEvaluator
 
 INPUT_FIELD_DEF = "definition"
 INPUT_FIELD_SYMBOL = "symbol"
@@ -30,13 +30,12 @@ class NLParamParser(object):
     """
     Modeling interface for Optimus v2.
     The interface collects the user input as natural language parameter builder
-
     """
 
-    def __init__(self, problem_type: str = NLP_PROBLEM_UNKNOWN) -> None:
+    def __init__(self, problem_type: str = NLP_PROBLEM_UNKNOWN, client=None) -> None:
         """
-
         :param problem_type: Type of the optimization problem
+        :param client: OpenAI client for using ComplexityEvaluator
         """
 
         # Data parameters for modeling
@@ -50,6 +49,9 @@ class NLParamParser(object):
         self._objective = {}  # type: Dict
 
         self._problem_type = problem_type  # type: str
+
+        self.client = client if client else get_openai_client()
+        self.complexity_evaluator = ComplexityEvaluator(client=self.client)
 
         return
 
@@ -72,11 +74,6 @@ class NLParamParser(object):
         :param param_dim: Dimension of the data. Could be NLP_PARAM_CONSTANT or NLP_PARAM_DIMENSION
         :return:
         """
-
-        # if param_dim != NLP_PARAM_CONSTANT:
-        #     for d in param_dim:
-        #         if d not in self._dimensions.keys():
-        #             raise RuntimeError("Dimension %d is not existent" % d)
 
         optimus_nlp_param = "Optimus_param_{0}".format(symbol)
 
@@ -182,7 +179,14 @@ class NLParamParser(object):
             "data_json_path": "data.json",
         }
 
-        return self.prep_problem_json(state)
+        state = self.prep_problem_json(state)
+
+        # Evaluate complexity of the problem
+        complexity_result = self.complexity_evaluator.evaluate_complexity(state)
+        state["complexity_score"] = complexity_result["score"]
+        state["complexity_details"] = complexity_result["details"]
+
+        return state
 
 
 def sanity_check(state):
