@@ -62,6 +62,42 @@ to identify the next agent to work on the problem, and also the task it has to c
             print("Round", self.conversation_state["round"])
             # print(json.dumps(state, indent=4))
 
+            # Decide which agent to call based on complexity score
+            complexity_score = state.get("complexity_score", 5)  # If there is no rating, the default value is 5
+            if complexity_score <= 3:
+                # Simple problems are straightforward for Programmer to code
+                decision = {
+                    "agent_name": "Programmer", 
+                    "task": "Write code for the optimization problem"
+                }
+            elif complexity_score <= 7:
+                # Moderately complex problems can be further processed by Formulator for modeling first
+                decision = {
+                    "agent_name": "Formulator", 
+                    "task": "Formulate the problem more precisely"
+                }
+            else:
+                # Complex problems, allowing ComplexityEvaluator to further refine the evaluation and make improvements
+                decision = {
+                    "agent_name": "ComplexityEvaluator", 
+                    "task": "Provide more detailed evaluation"
+                }
+
+            # Get and invoke the corresponding proxy
+            agent = next((agent for agent in self.agents 
+                          if agent.name == decision["agent_name"]), None)
+            if agent is None:
+                raise ValueError(f"Decision {decision} is not a valid agent name. Please choose from available agents.")
+
+            message, new_state = agent.generate_reply(task=decision["task"], state=state, sender=self)
+
+            # Update status and save logs
+            state = new_state
+            decision["result"] = message
+            self.history.append((decision, state))
+
+        self.conversation_state["round"] += 1
+
             agents_list = "".join(
                 [
                     "-" + agent.name + ": " + agent.description + "\n"
