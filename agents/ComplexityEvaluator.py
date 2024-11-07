@@ -25,6 +25,11 @@ Please provide a numeric rating between 1 and 10 for the complexity of this prob
     def generate_reply(self, task: str, state: Dict, sender: Agent) -> (str, Dict):
         # Get a description of the problem provided by the user
         problem_description = state.get("problem_description", "No description available.")
+
+        # Get an initial score
+        initial_complexity = self.evaluate_complexity(state)
+        initial_score = initial_complexity["score"]
+        initial_details = initial_complexity["details"]
         
         # Constructing the prompt for evaluating complexity
         prompt = self.prompt_template.format(problem_description=problem_description)
