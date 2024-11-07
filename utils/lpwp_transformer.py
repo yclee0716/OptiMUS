@@ -220,7 +220,7 @@ Take a deep breath and tackle the problem step by step.
 """
 
 
-def transform_lpwp_instance(folder_dir: str, client):
+def transform_lpwp_instance(folder_dir: str, client, complexity_evaluator: ComplexityEvaluator):
     """Clean the LPWP instance in the given folder.
 
     Args:
@@ -229,7 +229,8 @@ def transform_lpwp_instance(folder_dir: str, client):
 
     with open(folder_dir + "/description.txt", "r") as f:
         description = f.read()
-
+        
+    # Step 1: Generate prompt for LLM to re-write the problem in a textbook format
     prompt = prompt_template.format(description=description)
 
     print(prompt)
@@ -275,6 +276,17 @@ def transform_lpwp_instance(folder_dir: str, client):
 
     update["description"] = output_desc
 
+    # Step 2: Use ComplexityEvaluator to evaluate the problem complexity
+    state = {
+        "problem_description": output_desc,
+        "parameters": update["parameters"],
+    }
+    _, updated_state = complexity_evaluator.generate_reply(task="Evaluate complexity", state=state, sender=None)
+
+    # Add complexity evaluation to the update
+    update["complexity_score"] = updated_state.get("complexity_score", 5)
+    update["complexity_explanation"] = updated_state.get("complexity_explanation", "Complexity evaluation not available.")
+    
     return update
 
 
@@ -411,7 +423,8 @@ def transform_nlp4lp_instance(snop: str, client):
 
 if __name__ == "__main__":
     client = get_openai_client()
-
+    complexity_evaluator = ComplexityEvaluator(client=client)
+    
     path = "data/nl4opt/LPWP"
 
     for i in range(1, 288):
@@ -419,7 +432,7 @@ if __name__ == "__main__":
         if os.path.exists(os.path.join(path, f"prob_{i}/input.json")):
             continue
         try:
-            json_file = transform_lpwp_instance(os.path.join(path, f"prob_{i}"), client)
+            json_file = transform_lpwp_instance(os.path.join(path, f"prob_{i}"), client, complexity_evaluator)
             json_str = json.dumps(json_file, indent=4)
             with open(os.path.join(path, f"prob_{i}/input.json"), "w+") as f:
                 f.write(json_str)
