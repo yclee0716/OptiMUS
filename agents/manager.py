@@ -96,7 +96,7 @@ to identify the next agent to work on the problem, and also the task it has to c
             decision["result"] = message
             self.history.append((decision, state))
 
-        self.conversation_state["round"] += 1
+            self.conversation_state["round"] += 1
 
             agents_list = "".join(
                 [
