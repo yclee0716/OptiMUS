@@ -11,7 +11,7 @@ from agents.user_proxy import UserProxy
 from agents.formulator import Formulator
 from agents.programmer import Programmer
 from agents.evaluator import Evaluator
-
+from agents.complexity_evaluator import ComplexityEvaluator
 
 def main():
     parser = argparse.ArgumentParser(description="Run the algorithm on the dataset")
@@ -75,10 +75,6 @@ def main():
     tai_client = get_tai_client()
     mistral_client = get_mistral_client()
 
-    openai_client = get_openai_client()
-    tai_client = get_tai_client()
-    mistral_client = get_mistral_client()
-
     if args.model.startswith("gpt"):
         client = openai_client
     elif args.model.startswith("mistral-medium"):
@@ -95,13 +91,15 @@ def main():
 
     evaluator = Evaluator(client=client, llm=args.model)
 
+    complexity_evaluator = ComplexityEvaluator(client=client, llm=args.model)
+
     manager = GroupChatManager(
         client=client,
         agents=[
             formulator,
             programmer,
             evaluator,
-            #    user_proxy
+            complexity_evaluator,  # Adding ComplexityEvaluator to the manager's agents list
         ],
         llm=args.model,
     )
@@ -140,7 +138,14 @@ def main():
     if not os.path.exists(state["log_folder"]):
         os.makedirs(state["log_folder"])
 
+    # Perform a sanity check on the input state
     sanity_check(state)
+
+    # Evaluate complexity before solving the problem
+    complexity_result = complexity_evaluator.evaluate_complexity(state)
+    state["complexity_score"] = complexity_result["score"]
+    state["complexity_explanation"] = complexity_result["details"]
+
     try:
         final_state = manager.solve(state=state)
         with open(f"data/{dataset}/{problem}/output.json", "w") as f:
@@ -154,7 +159,6 @@ def main():
             f.write(traceback.format_exc())
 
     print("DONE!")
-
 
 if __name__ == "__main__":
     main()
