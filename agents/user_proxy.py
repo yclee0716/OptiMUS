@@ -51,4 +51,8 @@ Write a question to the user to collect the information needed to complete the t
             state["user_clarifications"] = []
         state["user_clarifications"].append(information)
 
+        state["problem_description"] = response
+        complexity_evaluator = ComplexityEvaluator(client = self.client)
+        _, state = complexity_evaluator.generate_reply(task = task, state = state, sneder = self)
+        
         return information, state
