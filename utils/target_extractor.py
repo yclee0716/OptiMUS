@@ -2,6 +2,7 @@ import openai
 import json
 import os
 from misc import get_openai_client
+from agents.complexity_evaluator import ComplexityEvaluator
 
 prompt_templates = [
     """
@@ -187,6 +188,15 @@ def extract_targets_for_lpwp_instance(folder_dir: str, client):
     update["description"] = description
     update["parameters"] = input_json["parameters"]
 
+    # Integrate Complexity Evaluator
+    complexity_evaluator = ComplexityEvaluator(client=client)
+    complexity_reply, complexity_state = complexity_evaluator.generate_reply(
+        task="Evaluate complexity", state=update, sender=None
+    )
+
+    update["complexity_score"] = complexity_state.get("complexity_score")
+    update["complexity_explanation"] = complexity_state.get("complexity_explanation")
+    
     return update
 
 
