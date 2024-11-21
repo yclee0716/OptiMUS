@@ -1,0 +1,47 @@
+{
+    "parameters": [
+        {
+            "definition": "Maximum number of hours available for production in the factory",
+            "symbol": "MaxProductionHours",
+            "value": 160,
+            "shape": []
+        },
+        {
+            "definition": "Total labor cost limit for production activities",
+            "symbol": "LaborCostLimit",
+            "value": 50000,
+            "shape": []
+        },
+        {
+            "definition": "Number of different products to be produced",
+            "symbol": "NumProducts",
+            "value": 4,
+            "shape": []
+        },
+        {
+            "definition": "Cost per hour of labor for the production of each product",
+            "symbol": "LaborCostPerProduct",
+            "value": [20, 25, 30, 28],
+            "shape": ["NumProducts"]
+        },
+        {
+            "definition": "Required production time in hours for each product",
+            "symbol": "ProductionTimePerProduct",
+            "value": [2, 3, 2.5, 4],
+            "shape": ["NumProducts"]
+        },
+        {
+            "definition": "Profit generated per unit sold of each product",
+            "symbol": "ProfitPerProduct",
+            "value": [50, 60, 55, 70],
+            "shape": ["NumProducts"]
+        },
+        {
+            "definition": "Minimum production goal for each product",
+            "symbol": "MinProductionGoal",
+            "value": [10, 15, 12, 8],
+            "shape": ["NumProducts"]
+        }
+    ],
+    "description": "The factory aims to optimize production within the constraints of a maximum of \\param{MaxProductionHours} hours and a labor cost not exceeding \\param{LaborCostLimit} dollars. There are \\param{NumProducts} products, each with specific labor costs \\param{LaborCostPerProduct}, production times \\param{ProductionTimePerProduct}, and profit margins \\param{ProfitPerProduct}. The production targets for each product are at least \\param{MinProductionGoal} units. The objective is to maximize the total profit while adhering to time and cost restrictions."
+}

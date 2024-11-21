@@ -1,0 +1,7 @@
+A manufacturing company is planning to optimize its production schedule for three different products: A, B, and C. The company aims to maximize their total profit while managing resource utilization efficiently. They have a limited pool of skilled labor and a set number of machines that can be operated simultaneously. Given a total labor capacity of 2,000 hours and machine operation capacity of 1,000 machine-hours per month, they seek to configure their production plan.
+
+The production requirements and details are as follows: For Product A, each unit requires 3 labor hours and 2 machine hours, costs $50 to produce, and generates a profit of $30. For Product B, every unit requires 4 labor hours and 3 machine hours, costs $70, and yields a profit of $45. For Product C, each unit requires 2 labor hours and 1 machine hour, costs $60, and results in a profit of $35. 
+
+Additionally, due to market demand constraints, the company must ensure that at least 100 units of each product are produced monthly. However, total monthly production for each product cannot exceed 500 units. Furthermore, products A and B are part of a bundled contract that mandates the combined production of the two to be at least 300 units, with the goal of fulfilling a major order specifically for these items.
+
+The company wishes to maximize their monthly profit within these constraints, taking into account their limited resources and mandatory production levels to meet contractual obligations.
