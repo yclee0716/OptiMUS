@@ -1,10 +1,6 @@
-import asyncio
-import aiohttp
 import os
 import json
-from nest_asyncio import apply
 
-# Step 1: 生成问题类型和领域的分类库
 def generate_problem_categories(file_path="categories.json"):
     categories = {
         "academic": {
