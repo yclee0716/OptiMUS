@@ -4,7 +4,7 @@ import os
 import json
 from nest_asyncio import apply
 
-api_key = "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"
+api_key = "YourAPIKeys"
 
 # Asynchronous function to generate responses in batch
 async def generate_responses_in_batch_async(prompts, model="gpt-4o", max_tokens=1500):
